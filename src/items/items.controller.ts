@@ -8,7 +8,7 @@ import {
   Patch,
   Post,
 } from '@nestjs/common';
-import { Item } from './item.model';
+import { Item } from '@prisma/client';
 import { ItemsService } from './items.service';
 import { CreateItemDto } from './dto/create-item.dto';
 
@@ -17,27 +17,27 @@ export class ItemsController {
   constructor(private readonly itemsService: ItemsService) {}
 
   @Get()
-  findAll(): Item[] {
+  async findAll(): Promise<Item[]> {
     return this.itemsService.findAll();
   }
 
-  @Get(':id') // /items/{id}
-  findById(@Param('id', new ParseUUIDPipe()) id: string): Item {
-    return this.itemsService.findById(id);
+  // @Get(':id') // /items/{id}
+  // findById(@Param('id', new ParseUUIDPipe()) id: string): Item {
+  //   return this.itemsService.findById(id);
+  // }
+
+  @Post()
+  async create(@Body() item: Item): Promise<Item> {
+    return this.itemsService.create(item);
   }
 
-  @Post() // DTOを使った書き方
-  create(@Body() createItemDto: CreateItemDto): Item {
-    return this.itemsService.create(createItemDto);
-  }
+  // @Patch(':id')
+  // updateStatus(@Param('id', ParseUUIDPipe) id: string): Item {
+  //   return this.itemsService.updateStatus(id);
+  // }
 
-  @Patch(':id')
-  updateStatus(@Param('id', ParseUUIDPipe) id: string): Item {
-    return this.itemsService.updateStatus(id);
-  }
-
-  @Delete(':id')
-  delete(@Param('id', ParseUUIDPipe) id: string): void {
-    this.itemsService.delete(id);
-  }
+  // @Delete(':id')
+  // delete(@Param('id', ParseUUIDPipe) id: string): void {
+  //   this.itemsService.delete(id);
+  // }
 }
