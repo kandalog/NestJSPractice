@@ -1,10 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { CreateItemDto } from './dto/create-item.dto';
 import { ItemStatus } from './item-status.enum';
 import { Item } from '@prisma/client';
-import { v4 as uuid } from 'uuid';
 import { PrismaService } from 'src/prisma.service';
-import { timeStamp } from 'console';
 
 @Injectable()
 export class ItemsService {
@@ -16,13 +13,17 @@ export class ItemsService {
     return this.prisma.item.findMany();
   }
 
-  // findById(id: string): Item {
-  //   const found = this.items.find((item) => item.id == id);
-  //   if (!found) {
-  //     throw new NotFoundException();
-  //   }
-  //   return found;
-  // }
+  async findById(id: string): Promise<Item> {
+    const item = await this.prisma.item.findUnique({
+      where: {
+        id: String(id),
+      },
+    });
+    if (!item) {
+      new NotFoundException();
+    }
+    return item;
+  }
 
   async create(item: Item): Promise<Item> {
     return this.prisma.item.create({
@@ -32,13 +33,18 @@ export class ItemsService {
     });
   }
 
-  // updateStatus(id: string): Item {
-  //   const item = this.findById(id);
-  //   item.status = ItemStatus.SOLD_OUT;
-  //   return item;
-  // }
+  async update(id: string): Promise<Item> {
+    return this.prisma.item.update({
+      where: { id: id },
+      data: {
+        status: ItemStatus.SOLD_OUT,
+      },
+    });
+  }
 
-  // delete(id: string): void {
-  //   this.items = this.items.filter((item) => item.id != id);
-  // }
+  async delete(id: string): Promise<Item> {
+    return this.prisma.item.delete({
+      where: { id: id },
+    });
+  }
 }
